@@ -5,12 +5,20 @@
     schema: public
     name: investment
   object_relationships:
-  - name: company
-    using:
-      foreign_key_constraint_on: company_id
-  - name: investor
-    using:
-      foreign_key_constraint_on: investor_id
+    - name: company
+      using:
+        foreign_key_constraint_on: company_id
+    - name: investor
+      using:
+        foreign_key_constraint_on: investor_id
 - table:
     schema: public
     name: investor
+  array_relationships:
+    - name: investments
+      using:
+        foreign_key_constraint_on:
+          column: investor_id
+          table:
+            schema: public
+            name: investment
