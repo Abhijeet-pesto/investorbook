@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './InvestorView.css';
+import { useQuery } from '@apollo/client';
+import { GET_INVESTORS } from '../../queries/queries';
 import {
 	TableContainer,
 	Table,
@@ -9,65 +11,16 @@ import {
 	TableCell,
 	TableRow,
 	TablePagination,
-	CircularProgress,
-	Tooltip,
 } from '@material-ui/core';
-import { useQuery, gql } from '@apollo/client';
-import { withStyles, makeStyles } from '@material-ui/core/styles';
-
-const GET_INVESTORS = gql`
-	query GetInvestors($limitBy: Int, $offsetBy: Int, $investmentsLimit: Int) {
-		currentInvestors: investor(limit: $limitBy, offset: $offsetBy) {
-			id
-			name
-			photo_thumbnail
-			investments(limit: $investmentsLimit) {
-				company {
-					id
-					name
-				}
-				amount
-			}
-		}
-		totalInvestors: investor_aggregate {
-			aggregate {
-				count
-			}
-		}
-	}
-`;
-
-const useStyles = makeStyles({
-	investorName: {
-		width: '25%',
-		padding: '1rem 1rem 1rem 0',
-	},
-	investments: {
-		padding: '1rem 0.5rem',
-		height: '10rem',
-	},
-	tableFooter: {
-		fontWeight: 'bold',
-	},
-});
-
-const StyledTableHeadCell = withStyles({
-	root: {
-		fontSize: '1.5rem',
-		color: '#a5a5a5',
-		padding: '1rem 0.5rem',
-	},
-})(TableCell);
-
-const StyledTooltip = withStyles({
-	tooltip: {
-		fontSize: '1.5rem',
-	},
-})(Tooltip);
+import {
+	useStyles,
+	StyledTableHeadCell,
+	StyledTooltip,
+} from '../../assets/customStyles';
 
 export const InvestorView = () => {
 	const [page, setPage] = useState(0);
-	const [rowsPerPage, setRowsPerPage] = useState(5);
+	const [rowsPerPage, setRowsPerPage] = useState(6);
 
 	const classes = useStyles();
 
@@ -94,26 +47,9 @@ export const InvestorView = () => {
 			currency: 'USD',
 		}).format(value);
 
-	if (loading) {
-		return (
-			<div className='investor-view-loader'>
-				<span>Fetching Investors</span>
-				<CircularProgress />
-			</div>
-		);
-	}
-
 	const addInvestor = () => {
 		alert('New Investor');
 	};
-
-	if (error) {
-		return (
-			<div className='investor-view-loader'>
-				<span>Error</span>
-			</div>
-		);
-	}
 
 	return (
 		<div className='investor-view-container'>
@@ -129,21 +65,35 @@ export const InvestorView = () => {
 					</button>
 				</div>
 			</div>
-			{data.currentInvestors.length === 0 ? (
-				<div className='investor-view-loader'>
-					<span>No Investors found</span>
-				</div>
-			) : (
-				<TableContainer>
-					<Table aria-label='investors table'>
-						<TableHead>
-							<TableRow>
-								<StyledTableHeadCell>NAME</StyledTableHeadCell>
-								<StyledTableHeadCell>INVESTMENTS</StyledTableHeadCell>
-							</TableRow>
-						</TableHead>
-						<TableBody>
-							{data.currentInvestors.map((investor) => (
+			<TableContainer>
+				<Table aria-label='investors table'>
+					<TableHead>
+						<TableRow>
+							<StyledTableHeadCell>NAME</StyledTableHeadCell>
+							<StyledTableHeadCell>INVESTMENTS</StyledTableHeadCell>
+						</TableRow>
+					</TableHead>
+					<TableBody>
+						{loading ? (
+							Array.from({ length: rowsPerPage }, (_, index) => (
+								<TableRow key={index}>
+									<TableCell className={classes.investorName}>
+										<div className='investor-details-loading'>
+											<span className='investor-icon-loading loading-animation'></span>
+											<span className='investor-name-loading loading-animation'></span>
+										</div>
+									</TableCell>
+									<TableCell className={classes.investments}>
+										<div className='table-row-loading loading-animation'></div>
+									</TableCell>
+								</TableRow>
+							))
+						) : error ? (
+							<div className='table-loading-error'>
+								<span>Error</span>
+							</div>
+						) : (
+							data.currentInvestors.map((investor) => (
 								<TableRow key={investor.id}>
 									<TableCell className={classes.investorName}>
 										<div className='investor-details'>
@@ -176,24 +126,35 @@ export const InvestorView = () => {
 										)}
 									</TableCell>
 								</TableRow>
-							))}
-						</TableBody>
-						<TableFooter>
-							<TableRow>
-								<TablePagination
-									className={classes.tableFooter}
-									rowsPerPageOptions={[5, 10]}
-									rowsPerPage={rowsPerPage}
-									page={page}
-									count={data.totalInvestors.aggregate.count}
-									onChangePage={handleChangePage}
-									onChangeRowsPerPage={handleChangeRowsPerPage}
-								/>
-							</TableRow>
-						</TableFooter>
-					</Table>
-				</TableContainer>
-			)}
+							))
+						)}
+					</TableBody>
+					<TableFooter>
+						<TableRow>
+							{loading ? (
+								<>
+									<TableCell className={classes.tableFooterCell} />
+									<TableCell className={classes.tableFooterCell}>
+										<div className='table-footer-loading loading-animation'></div>
+									</TableCell>
+								</>
+							) : (
+								!error && (
+									<TablePagination
+										className={classes.tableFooterCell}
+										rowsPerPageOptions={[6, 12]}
+										rowsPerPage={rowsPerPage}
+										page={page}
+										count={data.totalInvestors.aggregate.count}
+										onChangePage={handleChangePage}
+										onChangeRowsPerPage={handleChangeRowsPerPage}
+									/>
+								)
+							)}
+						</TableRow>
+					</TableFooter>
+				</Table>
+			</TableContainer>
 		</div>
 	);
 };

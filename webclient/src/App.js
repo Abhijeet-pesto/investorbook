@@ -1,12 +1,16 @@
 import React from 'react';
 import './App.css';
-import Investors from './Investors';
-import { Home } from './routes/Home/Home';
+import { Home } from './routes';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 
 function App() {
 	return (
 		<div className='App'>
-			<Home />
+			<Router>
+				<Route path='/' exact>
+					<Home />
+				</Route>
+			</Router>
 		</div>
 	);
 }

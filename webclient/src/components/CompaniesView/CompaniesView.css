@@ -1,0 +1,24 @@
+.companies-details-loading {
+	height: 2rem;
+}
+
+.company-details {
+	display: flex;
+	align-items: center;
+}
+
+.company-details .company-name {
+	font-size: 1.5rem;
+	font-weight: bold;
+}
+
+.company-investor {
+	font-size: 1.25rem;
+	color: #a5a5a5;
+}
+
+.company-name:hover,
+.company-investor:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}
