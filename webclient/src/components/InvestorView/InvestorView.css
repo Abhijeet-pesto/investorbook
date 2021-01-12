@@ -1,0 +1,76 @@
+.investor-view-header {
+	padding: 2rem 0;
+	text-align: left;
+	display: flex;
+}
+
+.investor-view-header .title {
+	font-size: 3rem;
+	font-weight: 500;
+	margin-right: 2rem;
+}
+
+.add-investor-btn {
+	font-size: 1.5rem;
+	font-weight: 500;
+	margin-right: 2rem;
+	background: #ffffff;
+	border-radius: 3px;
+	border: 1px solid #3f51b5;
+	color: #3f51b5;
+	padding: 0.5rem 1rem;
+	-moz-box-shadow: inset 0 0 2px #3f51b5;
+	-webkit-box-shadow: inset 0 0 2px #3f51b5;
+	box-shadow: inset 0 0 2px #3f51b5;
+	cursor: pointer;
+}
+
+.add-investor-btn:focus {
+	outline: none;
+}
+
+.investor-details {
+	display: flex;
+	align-items: center;
+}
+
+.investor-details img {
+	width: 5rem;
+	height: 5rem;
+	border-radius: 50%;
+	margin-right: 2rem;
+}
+
+.investor-details .investor-name {
+	font-size: 1.2rem;
+	font-weight: bold;
+}
+
+.investor-company {
+	font-size: 1.25rem;
+	color: #a5a5a5;
+}
+
+.MuiTablePagination-caption,
+.MuiTablePagination-select {
+	font-weight: bold !important;
+	font-size: 1.2rem !important;
+}
+
+.investor-view-loader {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 50vh;
+}
+
+.investor-view-loader span {
+	font-size: 2rem;
+	margin-right: 1rem;
+}
+
+.investor-name:hover,
+.investor-company:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}

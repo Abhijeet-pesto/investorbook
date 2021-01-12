@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './InvestorView.css';
 import {
 	TableContainer,
@@ -9,20 +9,24 @@ import {
 	TableCell,
 	TableRow,
 	TablePagination,
+	CircularProgress,
+	Tooltip,
 } from '@material-ui/core';
 import { useQuery, gql } from '@apollo/client';
+import { withStyles, makeStyles } from '@material-ui/core/styles';
 
 const GET_INVESTORS = gql`
-	query GetInvestors {
-		currentInvestors: investor(limit: 50) {
+	query GetInvestors($limitBy: Int, $offsetBy: Int, $investmentsLimit: Int) {
+		currentInvestors: investor(limit: $limitBy, offset: $offsetBy) {
 			id
 			name
 			photo_thumbnail
-			investments {
+			investments(limit: $investmentsLimit) {
 				company {
 					id
 					name
 				}
+				amount
 			}
 		}
 		totalInvestors: investor_aggregate {
@@ -33,11 +37,47 @@ const GET_INVESTORS = gql`
 	}
 `;
 
+const useStyles = makeStyles({
+	investorName: {
+		width: '25%',
+		padding: '1rem 1rem 1rem 0',
+	},
+	investments: {
+		padding: '1rem 0.5rem',
+		height: '10rem',
+	},
+	tableFooter: {
+		fontWeight: 'bold',
+	},
+});
+
+const StyledTableHeadCell = withStyles({
+	root: {
+		fontSize: '1.5rem',
+		color: '#a5a5a5',
+		padding: '1rem 0.5rem',
+	},
+})(TableCell);
+
+const StyledTooltip = withStyles({
+	tooltip: {
+		fontSize: '1.5rem',
+	},
+})(Tooltip);
+
 export const InvestorView = () => {
 	const [page, setPage] = useState(0);
 	const [rowsPerPage, setRowsPerPage] = useState(5);
 
-	const { loading, error, data } = useQuery(GET_INVESTORS);
+	const classes = useStyles();
+
+	const { loading, error, data } = useQuery(GET_INVESTORS, {
+		variables: {
+			limitBy: rowsPerPage,
+			offsetBy: rowsPerPage * page,
+			investmentsLimit: 50,
+		},
+	});
 
 	const handleChangePage = (event, newPage) => {
 		setPage(newPage);
@@ -48,62 +88,112 @@ export const InvestorView = () => {
 		setPage(0);
 	};
 
-	if (loading) return <p>Loading...</p>;
-	if (error) return <p>Error :(</p>;
-	if (data.currentInvestors.length === 0) return <p>The database is empty!</p>;
+	const formatAmount = (value) =>
+		new Intl.NumberFormat('en-US', {
+			style: 'currency',
+			currency: 'USD',
+		}).format(value);
+
+	if (loading) {
+		return (
+			<div className='investor-view-loader'>
+				<span>Fetching Investors</span>
+				<CircularProgress />
+			</div>
+		);
+	}
+
+	const addInvestor = () => {
+		alert('New Investor');
+	};
+
+	if (error) {
+		return (
+			<div className='investor-view-loader'>
+				<span>Error</span>
+			</div>
+		);
+	}
 
 	return (
 		<div className='investor-view-container'>
 			<div className='investor-view-header'>
-				<span className='title'>Investors</span>
-				<button type='button'>Add Investor</button>
+				<div className='title'>Investors</div>
+				<div className='add-btn-container'>
+					<button
+						type='button'
+						className='add-investor-btn'
+						onClick={addInvestor}
+					>
+						Add Investor
+					</button>
+				</div>
 			</div>
-			<TableContainer>
-				<Table aria-label='investors table'>
-					<TableHead>
-						<TableRow>
-							<TableCell>Name</TableCell>
-							<TableCell>Investments</TableCell>
-						</TableRow>
-					</TableHead>
-					<TableBody>
-						{data.currentInvestors
-							.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-							.map((investor) => (
+			{data.currentInvestors.length === 0 ? (
+				<div className='investor-view-loader'>
+					<span>No Investors found</span>
+				</div>
+			) : (
+				<TableContainer>
+					<Table aria-label='investors table'>
+						<TableHead>
+							<TableRow>
+								<StyledTableHeadCell>NAME</StyledTableHeadCell>
+								<StyledTableHeadCell>INVESTMENTS</StyledTableHeadCell>
+							</TableRow>
+						</TableHead>
+						<TableBody>
+							{data.currentInvestors.map((investor) => (
 								<TableRow key={investor.id}>
-									<TableCell>
-										<img
-											className='investor-icon'
-											src={investor.photo_thumbnail}
-											alt='No Pic'
-										/>
-										<span className='investor-name'>{investor.name}</span>
+									<TableCell className={classes.investorName}>
+										<div className='investor-details'>
+											<img
+												className='investor-icon'
+												src={investor.photo_thumbnail}
+												alt='No Pic'
+											/>
+											<span className='investor-name'>{investor.name}</span>
+										</div>
 									</TableCell>
-									<TableCell>
-										{investor.investments.map(({ company }, index) => (
-											<span className='investor-company' key={company.id}>
-												{company.name}
-												{index === investor.investments.length - 1 && ','}
+									<TableCell className={classes.investments}>
+										{investor.investments.length > 0 ? (
+											investor.investments.map(({ company, amount }, index) => (
+												<StyledTooltip
+													key={company.id}
+													arrow
+													title={`Invested: ${formatAmount(amount)}`}
+												>
+													<span className='investor-company'>
+														{company.name}
+														{index !== investor.investments.length - 1 && ', '}
+													</span>
+												</StyledTooltip>
+											))
+										) : (
+											<span className='investor-company'>
+												No Investments yet!
 											</span>
-										))}
+										)}
 									</TableCell>
 								</TableRow>
 							))}
-					</TableBody>
-					<TableFooter>
-						<TableRow>
-							<TablePagination
-								rowsPerPageOptions={[5, 10]}
-								rowsPerPage={rowsPerPage}
-								page={page}
-								count={data.totalInvestors.aggregate.count}
-								onChangePage={handleChangePage}
-								onChangeRowsPerPage={handleChangeRowsPerPage}
-							/>
-						</TableRow>
-					</TableFooter>
-				</Table>
-			</TableContainer>
+						</TableBody>
+						<TableFooter>
+							<TableRow>
+								<TablePagination
+									className={classes.tableFooter}
+									rowsPerPageOptions={[5, 10]}
+									rowsPerPage={rowsPerPage}
+									page={page}
+									count={data.totalInvestors.aggregate.count}
+									onChangePage={handleChangePage}
+									onChangeRowsPerPage={handleChangeRowsPerPage}
+								/>
+							</TableRow>
+						</TableFooter>
+					</Table>
+				</TableContainer>
+			)}
 		</div>
 	);
 };

@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
 import { Tabs, Tab } from '@material-ui/core';
 import { TabPanel } from './TabPanel';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 
 const AntTabs = withStyles({
 	root: {
 		borderBottom: '1px solid #e8e8e8',
 	},
 	indicator: {
-		backgroundColor: '#1890ff',
+		height: '0.3rem',
+		backgroundColor: 'black',
 	},
 })(Tabs);
 
 const AntTab = withStyles((theme) => ({
 	root: {
+		fontSize: '1.5rem',
 		textTransform: 'none',
 		minWidth: 72,
 		fontWeight: theme.typography.fontWeightRegular,
@@ -35,11 +37,11 @@ const AntTab = withStyles((theme) => ({
 			opacity: 1,
 		},
 		'&$selected': {
-			color: '#1890ff',
+			color: 'black',
 			fontWeight: theme.typography.fontWeightMedium,
 		},
 		'&:focus': {
-			color: '#40a9ff',
+			color: 'black',
 		},
 	},
 	selected: {},

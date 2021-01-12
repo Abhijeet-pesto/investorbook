@@ -1,5 +1,5 @@
 html {
-	font-size: 10px;
+	/* font-size: 10px; */
 	scroll-behavior: smooth;
 }
 
@@ -11,8 +11,8 @@ body {
 
 html,
 body,
-#root,
-.App,
+/* #root,
+.App, */
 .fullHeight {
 	height: 100%;
 }
@@ -26,7 +26,7 @@ body,
 }
 
 body {
-	margin: 0;
+	line-height: 1;
 	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
 		'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
 		sans-serif;
@@ -37,4 +37,50 @@ body {
 code {
 	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
 		monospace;
+}
+
+::-webkit-scrollbar {
+	width: 5px;
+}
+
+::-webkit-scrollbar-track {
+	background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #555;
+}
+
+@media only screen and (min-width: 576px) {
+	html {
+		font-size: 4px;
+	}
+}
+
+@media only screen and (min-width: 768px) {
+	html {
+		font-size: 6px;
+	}
+}
+
+@media only screen and (min-width: 992px) {
+	html {
+		font-size: 7px;
+	}
+}
+
+@media only screen and (min-width: 1200px) {
+	html {
+		font-size: 8px;
+	}
+}
+
+@media only screen and (min-width: 1400px) {
+	html {
+		font-size: 10px;
+	}
 }
