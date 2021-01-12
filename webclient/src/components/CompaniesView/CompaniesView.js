@@ -51,6 +51,14 @@ export const CompaniesView = () => {
 		alert('New Investor');
 	};
 
+	if (!loading && error) {
+		return (
+			<div className='table-loading-error'>
+				<span>Error! Please refresh and try again.</span>
+			</div>
+		);
+	}
+
 	return (
 		<div className='companies-view-container'>
 			<div className='companies-view-header'>
@@ -74,52 +82,46 @@ export const CompaniesView = () => {
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{loading ? (
-							Array.from({ length: rowsPerPage }, (_, index) => (
-								<TableRow key={index}>
-									<TableCell className={classes.companyName}>
-										<div className='companies-details-loading loading-animation'></div>
-									</TableCell>
-									<TableCell className={classes.investments}>
-										<div className='table-row-loading loading-animation'></div>
-									</TableCell>
-								</TableRow>
-							))
-						) : error ? (
-							<div className='table-loading-error'>
-								<span>Error</span>
-							</div>
-						) : (
-							data.companies.map((company) => (
-								<TableRow key={company.id}>
-									<TableCell className={classes.companyName}>
-										<div className='company-details'>
-											<span className='company-name'>{company.name}</span>
-										</div>
-									</TableCell>
-									<TableCell className={classes.investments}>
-										{company.investors.length > 0 ? (
-											company.investors.map(({ investor, amount }, index) => (
-												<StyledTooltip
-													key={investor.id}
-													arrow
-													title={`Invested: ${formatAmount(amount)}`}
-												>
-													<span className='company-investor'>
-														{investor.name}
-														{index !== company.investors.length - 1 && ', '}
-													</span>
-												</StyledTooltip>
-											))
-										) : (
-											<span className='company-investor'>
-												No Inverstors yet!
-											</span>
-										)}
-									</TableCell>
-								</TableRow>
-							))
-						)}
+						{loading
+							? Array.from({ length: rowsPerPage }, (_, index) => (
+									<TableRow key={index}>
+										<TableCell className={classes.companyName}>
+											<div className='companies-details-loading loading-animation'></div>
+										</TableCell>
+										<TableCell className={classes.investments}>
+											<div className='table-row-loading loading-animation'></div>
+										</TableCell>
+									</TableRow>
+							  ))
+							: data.companies.map((company) => (
+									<TableRow key={company.id}>
+										<TableCell className={classes.companyName}>
+											<div className='company-details'>
+												<span className='company-name'>{company.name}</span>
+											</div>
+										</TableCell>
+										<TableCell className={classes.investments}>
+											{company.investors.length > 0 ? (
+												company.investors.map(({ investor, amount }, index) => (
+													<StyledTooltip
+														key={investor.id}
+														arrow
+														title={`Invested: ${formatAmount(amount)}`}
+													>
+														<span className='company-investor'>
+															{investor.name}
+															{index !== company.investors.length - 1 && ', '}
+														</span>
+													</StyledTooltip>
+												))
+											) : (
+												<span className='company-investor'>
+													No Inverstors yet!
+												</span>
+											)}
+										</TableCell>
+									</TableRow>
+							  ))}
 					</TableBody>
 					<TableFooter>
 						<TableRow>
@@ -131,17 +133,15 @@ export const CompaniesView = () => {
 									</TableCell>
 								</>
 							) : (
-								!error && (
-									<TablePagination
-										className={classes.tableFooterCell}
-										rowsPerPageOptions={[6, 12]}
-										rowsPerPage={rowsPerPage}
-										page={page}
-										count={data.totalCompanies.aggregate.count}
-										onChangePage={handleChangePage}
-										onChangeRowsPerPage={handleChangeRowsPerPage}
-									/>
-								)
+								<TablePagination
+									className={classes.tableFooterCell}
+									rowsPerPageOptions={[6, 12]}
+									rowsPerPage={rowsPerPage}
+									page={page}
+									count={data.totalCompanies.aggregate.count}
+									onChangePage={handleChangePage}
+									onChangeRowsPerPage={handleChangeRowsPerPage}
+								/>
 							)}
 						</TableRow>
 					</TableFooter>

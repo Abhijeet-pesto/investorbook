@@ -51,6 +51,14 @@ export const InvestorView = () => {
 		alert('New Investor');
 	};
 
+	if (!loading && error) {
+		return (
+			<div className='table-loading-error'>
+				<span>Error! Please refresh and try again.</span>
+			</div>
+		);
+	}
+
 	return (
 		<div className='investor-view-container'>
 			<div className='investor-view-header'>
@@ -74,60 +82,57 @@ export const InvestorView = () => {
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{loading ? (
-							Array.from({ length: rowsPerPage }, (_, index) => (
-								<TableRow key={index}>
-									<TableCell className={classes.investorName}>
-										<div className='investor-details-loading'>
-											<span className='investor-icon-loading loading-animation'></span>
-											<span className='investor-name-loading loading-animation'></span>
-										</div>
-									</TableCell>
-									<TableCell className={classes.investments}>
-										<div className='table-row-loading loading-animation'></div>
-									</TableCell>
-								</TableRow>
-							))
-						) : error ? (
-							<div className='table-loading-error'>
-								<span>Error</span>
-							</div>
-						) : (
-							data.currentInvestors.map((investor) => (
-								<TableRow key={investor.id}>
-									<TableCell className={classes.investorName}>
-										<div className='investor-details'>
-											<img
-												className='investor-icon'
-												src={investor.photo_thumbnail}
-												alt='No Pic'
-											/>
-											<span className='investor-name'>{investor.name}</span>
-										</div>
-									</TableCell>
-									<TableCell className={classes.investments}>
-										{investor.investments.length > 0 ? (
-											investor.investments.map(({ company, amount }, index) => (
-												<StyledTooltip
-													key={company.id}
-													arrow
-													title={`Invested: ${formatAmount(amount)}`}
-												>
-													<span className='investor-company'>
-														{company.name}
-														{index !== investor.investments.length - 1 && ', '}
-													</span>
-												</StyledTooltip>
-											))
-										) : (
-											<span className='investor-company'>
-												No Investments yet!
-											</span>
-										)}
-									</TableCell>
-								</TableRow>
-							))
-						)}
+						{loading
+							? Array.from({ length: rowsPerPage }, (_, index) => (
+									<TableRow key={index}>
+										<TableCell className={classes.investorName}>
+											<div className='investor-details-loading'>
+												<span className='investor-icon-loading loading-animation'></span>
+												<span className='investor-name-loading loading-animation'></span>
+											</div>
+										</TableCell>
+										<TableCell className={classes.investments}>
+											<div className='table-row-loading loading-animation'></div>
+										</TableCell>
+									</TableRow>
+							  ))
+							: data.currentInvestors.map((investor) => (
+									<TableRow key={investor.id}>
+										<TableCell className={classes.investorName}>
+											<div className='investor-details'>
+												<img
+													className='investor-icon'
+													src={investor.photo_thumbnail}
+													alt='No Pic'
+												/>
+												<span className='investor-name'>{investor.name}</span>
+											</div>
+										</TableCell>
+										<TableCell className={classes.investments}>
+											{investor.investments.length > 0 ? (
+												investor.investments.map(
+													({ company, amount }, index) => (
+														<StyledTooltip
+															key={company.id}
+															arrow
+															title={`Invested: ${formatAmount(amount)}`}
+														>
+															<span className='investor-company'>
+																{company.name}
+																{index !== investor.investments.length - 1 &&
+																	', '}
+															</span>
+														</StyledTooltip>
+													),
+												)
+											) : (
+												<span className='investor-company'>
+													No Investments yet!
+												</span>
+											)}
+										</TableCell>
+									</TableRow>
+							  ))}
 					</TableBody>
 					<TableFooter>
 						<TableRow>
@@ -139,17 +144,15 @@ export const InvestorView = () => {
 									</TableCell>
 								</>
 							) : (
-								!error && (
-									<TablePagination
-										className={classes.tableFooterCell}
-										rowsPerPageOptions={[6, 12]}
-										rowsPerPage={rowsPerPage}
-										page={page}
-										count={data.totalInvestors.aggregate.count}
-										onChangePage={handleChangePage}
-										onChangeRowsPerPage={handleChangeRowsPerPage}
-									/>
-								)
+								<TablePagination
+									className={classes.tableFooterCell}
+									rowsPerPageOptions={[6, 12]}
+									rowsPerPage={rowsPerPage}
+									page={page}
+									count={data.totalInvestors.aggregate.count}
+									onChangePage={handleChangePage}
+									onChangeRowsPerPage={handleChangeRowsPerPage}
+								/>
 							)}
 						</TableRow>
 					</TableFooter>
